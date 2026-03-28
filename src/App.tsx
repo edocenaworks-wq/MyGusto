@@ -358,8 +358,8 @@ export default function App() {
             <h1 className="text-3xl font-black tracking-tight text-stone-900">MyGusto</h1>
             <p className="text-stone-400 text-sm font-medium">Il tuo ricettario personale</p>
           </div>
-          <div className="bg-orange-100 p-3 rounded-2xl">
-            <ChefHat className="text-orange-600" size={28} />
+          <div className="w-12 h-12 rounded-2xl overflow-hidden shadow-sm border border-orange-100">
+            <img src="/logo.png" alt="MyGusto Logo" className="w-full h-full object-cover" />
           </div>
         </div>
 
