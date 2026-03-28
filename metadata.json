@@ -1,0 +1,7 @@
+{
+  "name": "MyGusto",
+  "description": "Il tuo ricettario personale open-source con salvataggio locale.",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}
