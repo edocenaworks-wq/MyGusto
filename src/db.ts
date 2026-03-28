@@ -7,6 +7,7 @@ export interface Recipe {
   instructions: string;
   prepTime: number; // in minutes
   cookTime: number; // in minutes
+  cookingInfo?: string; // e.g. temperature, oven mode, etc.
   image?: string; // base64 or local path
   createdAt: number;
   updatedAt: number;

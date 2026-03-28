@@ -10,13 +10,15 @@ import {
   Edit3, 
   ChevronLeft, 
   Camera,
-  X
+  X,
+  Check,
+  RotateCcw
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 
 // --- Components ---
 
-const RecipeCard = ({ recipe, onClick }: { recipe: Recipe; onClick: () => void; key?: React.Key }) => (
+const RecipeCard = ({ recipe, onClick }: { recipe: Recipe; onClick: () => void }) => (
   <motion.div
     layout
     initial={{ opacity: 0, y: 20 }}
@@ -58,6 +60,7 @@ const RecipeForm = ({
   const [title, setTitle] = useState(initialData?.title || '');
   const [ingredients, setIngredients] = useState(initialData?.ingredients.join('\n') || '');
   const [instructions, setInstructions] = useState(initialData?.instructions || '');
+  const [cookingInfo, setCookingInfo] = useState(initialData?.cookingInfo || '');
   const [prepTime, setPrepTime] = useState(initialData?.prepTime || 15);
   const [cookTime, setCookTime] = useState(initialData?.cookTime || 20);
   const [image, setImage] = useState(initialData?.image || '');
@@ -86,6 +89,7 @@ const RecipeForm = ({
               title, 
               ingredients: ingredients.split('\n').filter(i => i.trim()), 
               instructions, 
+              cookingInfo,
               prepTime, 
               cookTime, 
               image 
@@ -157,6 +161,17 @@ const RecipeForm = ({
             </div>
 
             <div>
+              <label className="block text-xs font-bold text-stone-400 uppercase tracking-wider mb-1">Informazioni di Cottura</label>
+              <textarea 
+                value={cookingInfo} 
+                onChange={e => setCookingInfo(e.target.value)}
+                rows={3}
+                placeholder="Es: Forno ventilato 180°C, ripiano centrale..."
+                className="w-full bg-white border-none rounded-2xl p-4 focus:ring-2 focus:ring-orange-500"
+              />
+            </div>
+
+            <div>
               <label className="block text-xs font-bold text-stone-400 uppercase tracking-wider mb-1">Procedimento</label>
               <textarea 
                 value={instructions} 
@@ -183,66 +198,118 @@ const RecipeDetail = ({
   onBack: () => void; 
   onEdit: () => void; 
   onDelete: () => void;
-}) => (
-  <div className="fixed inset-0 bg-stone-50 z-40 overflow-y-auto pb-24">
-    <div className="relative h-72">
-      {recipe.image ? (
-        <img src={recipe.image} className="w-full h-full object-cover" />
-      ) : (
-        <div className="w-full h-full bg-stone-200 flex items-center justify-center text-stone-400">
-          <ChefHat size={64} />
-        </div>
-      )}
-      <div className="absolute top-4 left-4 right-4 flex justify-between">
-        <button onClick={onBack} className="bg-white/80 backdrop-blur p-2 rounded-full text-stone-800">
-          <ChevronLeft size={24} />
-        </button>
-        <div className="flex gap-2">
-          <button onClick={onEdit} className="bg-white/80 backdrop-blur p-2 rounded-full text-stone-800">
-            <Edit3 size={20} />
+}) => {
+  const [checkedIngredients, setCheckedIngredients] = useState<Set<number>>(new Set());
+
+  const toggleIngredient = (index: number) => {
+    const newChecked = new Set(checkedIngredients);
+    if (newChecked.has(index)) {
+      newChecked.delete(index);
+    } else {
+      newChecked.add(index);
+    }
+    setCheckedIngredients(newChecked);
+  };
+
+  const resetIngredients = () => {
+    setCheckedIngredients(new Set());
+  };
+
+  return (
+    <div className="fixed inset-0 bg-stone-50 z-40 overflow-y-auto pb-24">
+      <div className="relative h-72">
+        {recipe.image ? (
+          <img src={recipe.image} className="w-full h-full object-cover" />
+        ) : (
+          <div className="w-full h-full bg-stone-200 flex items-center justify-center text-stone-400">
+            <ChefHat size={64} />
+          </div>
+        )}
+        <div className="absolute top-4 left-4 right-4 flex justify-between">
+          <button onClick={onBack} className="bg-white/80 backdrop-blur p-2 rounded-full text-stone-800">
+            <ChevronLeft size={24} />
           </button>
-          <button onClick={onDelete} className="bg-white/80 backdrop-blur p-2 rounded-full text-red-500">
-            <Trash2 size={20} />
-          </button>
+          <div className="flex gap-2">
+            <button onClick={onEdit} className="bg-white/80 backdrop-blur p-2 rounded-full text-stone-800">
+              <Edit3 size={20} />
+            </button>
+            <button onClick={onDelete} className="bg-white/80 backdrop-blur p-2 rounded-full text-red-500">
+              <Trash2 size={20} />
+            </button>
+          </div>
         </div>
+      </div>
+
+      <div className="px-6 -mt-8 relative bg-stone-50 rounded-t-[40px] pt-8">
+        <h1 className="text-3xl font-bold text-stone-900 leading-tight">{recipe.title}</h1>
+        
+        <div className="flex gap-6 mt-6">
+          <div className="flex flex-col">
+            <span className="text-xs font-bold text-stone-400 uppercase tracking-wider">Prep</span>
+            <span className="text-stone-800 font-semibold">{recipe.prepTime} min</span>
+          </div>
+          <div className="flex flex-col">
+            <span className="text-xs font-bold text-stone-400 uppercase tracking-wider">Cottura</span>
+            <span className="text-stone-800 font-semibold">{recipe.cookTime} min</span>
+          </div>
+        </div>
+
+        <div className="mt-8">
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-xl font-bold text-stone-800">Ingredienti</h2>
+            {checkedIngredients.size > 0 && (
+              <button 
+                onClick={resetIngredients}
+                className="flex items-center gap-1.5 text-xs font-bold text-orange-500 uppercase tracking-wider bg-orange-50 px-3 py-1.5 rounded-full active:scale-95 transition-transform"
+              >
+                <RotateCcw size={14} />
+                Reset Lista
+              </button>
+            )}
+          </div>
+          <ul className="space-y-3">
+            {recipe.ingredients.map((ing, i) => (
+              <li 
+                key={i} 
+                onClick={() => toggleIngredient(i)}
+                className={`flex items-center gap-3 p-4 rounded-2xl transition-all cursor-pointer ${
+                  checkedIngredients.has(i) 
+                    ? 'bg-orange-50 text-stone-400 line-through' 
+                    : 'bg-white text-stone-700 shadow-sm'
+                }`}
+              >
+                <div className={`w-6 h-6 rounded-lg border-2 flex items-center justify-center transition-colors ${
+                  checkedIngredients.has(i) 
+                    ? 'bg-orange-500 border-orange-500' 
+                    : 'border-stone-200 bg-stone-50'
+                }`}>
+                  {checkedIngredients.has(i) && <Check size={16} className="text-white" />}
+                </div>
+                <span className="font-medium">{ing}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        <div className="mt-8">
+          <h2 className="text-xl font-bold text-stone-800 mb-4">Procedimento</h2>
+          <p className="text-stone-600 leading-relaxed whitespace-pre-wrap">
+            {recipe.instructions}
+          </p>
+        </div>
+
+        {recipe.cookingInfo && (
+          <div className="mt-8">
+            <h2 className="text-xl font-bold text-stone-800 mb-4">Informazioni di Cottura</h2>
+            <div className="bg-orange-50 p-6 rounded-3xl text-stone-700 leading-relaxed border border-orange-100 italic">
+              {recipe.cookingInfo}
+            </div>
+          </div>
+        )}
       </div>
     </div>
-
-    <div className="px-6 -mt-8 relative bg-stone-50 rounded-t-[40px] pt-8">
-      <h1 className="text-3xl font-bold text-stone-900 leading-tight">{recipe.title}</h1>
-      
-      <div className="flex gap-6 mt-6">
-        <div className="flex flex-col">
-          <span className="text-xs font-bold text-stone-400 uppercase tracking-wider">Prep</span>
-          <span className="text-stone-800 font-semibold">{recipe.prepTime} min</span>
-        </div>
-        <div className="flex flex-col">
-          <span className="text-xs font-bold text-stone-400 uppercase tracking-wider">Cottura</span>
-          <span className="text-stone-800 font-semibold">{recipe.cookTime} min</span>
-        </div>
-      </div>
-
-      <div className="mt-8">
-        <h2 className="text-xl font-bold text-stone-800 mb-4">Ingredienti</h2>
-        <ul className="space-y-3">
-          {recipe.ingredients.map((ing, i) => (
-            <li key={i} className="flex items-center gap-3 text-stone-600">
-              <div className="w-1.5 h-1.5 bg-orange-400 rounded-full" />
-              {ing}
-            </li>
-          ))}
-        </ul>
-      </div>
-
-      <div className="mt-8">
-        <h2 className="text-xl font-bold text-stone-800 mb-4">Procedimento</h2>
-        <p className="text-stone-600 leading-relaxed whitespace-pre-wrap">
-          {recipe.instructions}
-        </p>
-      </div>
-    </div>
-  </div>
-);
+  );
+};
 
 // --- Main App ---
 
@@ -310,9 +377,9 @@ export default function App() {
 
       <main className="p-6 space-y-4">
         <AnimatePresence mode="popLayout">
-          {filteredRecipes?.map(recipe => (
+          {filteredRecipes?.map((recipe, index) => (
             <RecipeCard 
-              key={recipe.id} 
+              key={recipe.id || `recipe-${index}-${recipe.createdAt}`} 
               recipe={recipe} 
               onClick={() => setSelectedRecipe(recipe)} 
             />
