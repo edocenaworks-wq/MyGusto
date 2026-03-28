@@ -46,15 +46,23 @@ jobs:
 
       - name: Sign APK
         if: env.HAS_KEYSTORE == 'true'
-        uses: r0adkll/sign-android-release@v1
-        id: sign_app
-        with:
-          releaseDirectory: android/app/build/outputs/apk/release
-          signingKeyBase64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
-          alias: ${{ secrets.ANDROID_KEY_ALIAS }}
-          keyStorePassword: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
-          keyPassword: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
-          buildToolsVersion: "34.0.0"
+        run: |
+          # Trova l'ultima versione dei build-tools installata
+          BUILD_TOOLS_PATH=$(ls -d $ANDROID_HOME/build-tools/* | tail -n 1)
+          echo "Using build tools from: $BUILD_TOOLS_PATH"
+          
+          # Aggiungi i build-tools al PATH per trovare apksigner e zipalign
+          export PATH=$PATH:$BUILD_TOOLS_PATH
+          
+          # Estrai il Keystore
+          echo "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" | base64 -d > android/app/release.jks
+          
+          # Firma l'APK
+          apksigner sign --ks android/app/release.jks \
+            --ks-pass pass:${{ secrets.ANDROID_KEYSTORE_PASSWORD }} \
+            --ks-key-alias ${{ secrets.ANDROID_KEY_ALIAS }} \
+            --out android/app/build/outputs/apk/release/app-release-signed.apk \
+            android/app/build/outputs/apk/release/app-release-unsigned.apk
         env:
           HAS_KEYSTORE: ${{ secrets.ANDROID_KEYSTORE_BASE64 != '' }}
 
@@ -63,12 +71,12 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: app-release-signed
-          path: ${{ steps.sign_app.outputs.signedReleaseFile }}
+          path: android/app/build/outputs/apk/release/app-release-signed.apk
 
       - name: Create GitHub Release
         if: startsWith(github.ref, 'refs/tags/v') && env.HAS_KEYSTORE == 'true'
         uses: softprops/action-gh-release@v2
         with:
-          files: ${{ steps.sign_app.outputs.signedReleaseFile }}
+          files: android/app/build/outputs/apk/release/app-release-signed.apk
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
