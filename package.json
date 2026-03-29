@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "vite --port=3000 --host=0.0.0.0",
     "build": "vite build",
-    "assets": "capacitor-assets generate --android --iconSource assets/icon.png",
+    "assets": "capacitor-assets generate --android",
     "preview": "vite preview",
     "clean": "rm -rf dist",
     "lint": "tsc --noEmit"
