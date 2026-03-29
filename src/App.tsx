@@ -13,7 +13,9 @@ import {
   X,
   Check,
   RotateCcw,
-  Download
+  Download,
+  Moon,
+  Sun
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { App as CapacitorApp } from '@capacitor/app';
@@ -75,18 +77,18 @@ const RecipeCard = ({ recipe, onClick }: { recipe: Recipe; onClick: () => void }
     animate={{ opacity: 1, y: 0 }}
     whileHover={{ scale: 1.02 }}
     onClick={onClick}
-    className="bg-white rounded-2xl p-4 shadow-sm border border-stone-100 cursor-pointer flex gap-4"
+    className="bg-white dark:bg-stone-900 rounded-2xl p-4 shadow-sm border border-stone-100 dark:border-stone-800 cursor-pointer flex gap-4 transition-colors"
   >
-    <div className="w-20 h-20 bg-stone-100 rounded-xl flex items-center justify-center overflow-hidden flex-shrink-0">
+    <div className="w-20 h-20 bg-stone-100 dark:bg-stone-800 rounded-xl flex items-center justify-center overflow-hidden flex-shrink-0">
       {recipe.image ? (
         <img src={recipe.image} alt={recipe.title} className="w-full h-full object-cover" />
       ) : (
-        <ChefHat className="text-stone-300 w-8 h-8" />
+        <ChefHat className="text-stone-300 dark:text-stone-600 w-8 h-8" />
       )}
     </div>
     <div className="flex flex-col justify-center flex-1">
-      <h3 className="font-semibold text-stone-800 text-lg leading-tight">{recipe.title}</h3>
-      <div className="flex items-center gap-3 mt-2 text-stone-500 text-sm">
+      <h3 className="font-semibold text-stone-800 dark:text-stone-100 text-lg leading-tight">{recipe.title}</h3>
+      <div className="flex items-center gap-3 mt-2 text-stone-500 dark:text-stone-400 text-sm">
         <span className="flex items-center gap-1">
           <Clock size={14} /> {recipe.prepTime + recipe.cookTime} min
         </span>
@@ -125,13 +127,13 @@ const RecipeForm = ({
   };
 
   return (
-    <div className="fixed inset-0 bg-stone-50 z-50 overflow-y-auto p-4 pb-24">
+    <div className="fixed inset-0 bg-stone-50 dark:bg-stone-950 z-50 overflow-y-auto p-4 pb-24 transition-colors">
       <div className="max-w-md mx-auto">
         <div className="flex items-center justify-between mb-6">
-          <button onClick={onCancel} className="p-2 -ml-2 text-stone-600">
+          <button onClick={onCancel} className="p-2 -ml-2 text-stone-600 dark:text-stone-400">
             <X size={24} />
           </button>
-          <h2 className="text-xl font-bold text-stone-800">
+          <h2 className="text-xl font-bold text-stone-800 dark:text-stone-100">
             {initialData ? 'Modifica Ricetta' : 'Nuova Ricetta'}
           </h2>
           <button 
@@ -153,13 +155,13 @@ const RecipeForm = ({
 
         <div className="space-y-6">
           <div 
-            className="w-full aspect-video bg-stone-200 rounded-3xl overflow-hidden relative group cursor-pointer"
+            className="w-full aspect-video bg-stone-200 dark:bg-stone-800 rounded-3xl overflow-hidden relative group cursor-pointer"
             onClick={() => document.getElementById('img-input')?.click()}
           >
             {image ? (
               <img src={image} className="w-full h-full object-cover" />
             ) : (
-              <div className="flex flex-col items-center justify-center h-full text-stone-400">
+              <div className="flex flex-col items-center justify-center h-full text-stone-400 dark:text-stone-600">
                 <Camera size={48} strokeWidth={1.5} />
                 <p className="mt-2 font-medium">Aggiungi Foto</p>
               </div>
@@ -169,66 +171,66 @@ const RecipeForm = ({
 
           <div className="space-y-4">
             <div>
-              <label className="block text-xs font-bold text-stone-400 uppercase tracking-wider mb-1">Titolo</label>
+              <label className="block text-xs font-bold text-stone-400 dark:text-stone-500 uppercase tracking-wider mb-1">Titolo</label>
               <input 
                 value={title} 
                 onChange={e => setTitle(e.target.value)}
                 placeholder="Es: Pasta alla Carbonara"
-                className="w-full bg-white border-none rounded-2xl p-4 text-lg font-semibold focus:ring-2 focus:ring-orange-500"
+                className="w-full bg-white dark:bg-stone-900 border-none rounded-2xl p-4 text-lg font-semibold focus:ring-2 focus:ring-orange-500 text-stone-800 dark:text-stone-100 transition-colors placeholder:text-stone-300 dark:placeholder:text-stone-700"
               />
             </div>
 
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-xs font-bold text-stone-400 uppercase tracking-wider mb-1">Prep. (min)</label>
+                <label className="block text-xs font-bold text-stone-400 dark:text-stone-500 uppercase tracking-wider mb-1">Prep. (min)</label>
                 <input 
                   type="number"
                   value={prepTime} 
                   onChange={e => setPrepTime(Number(e.target.value))}
-                  className="w-full bg-white border-none rounded-2xl p-4 font-semibold focus:ring-2 focus:ring-orange-500"
+                  className="w-full bg-white dark:bg-stone-900 border-none rounded-2xl p-4 font-semibold focus:ring-2 focus:ring-orange-500 text-stone-800 dark:text-stone-100 transition-colors"
                 />
               </div>
               <div>
-                <label className="block text-xs font-bold text-stone-400 uppercase tracking-wider mb-1">Cottura (min)</label>
+                <label className="block text-xs font-bold text-stone-400 dark:text-stone-500 uppercase tracking-wider mb-1">Cottura (min)</label>
                 <input 
                   type="number"
                   value={cookTime} 
                   onChange={e => setCookTime(Number(e.target.value))}
-                  className="w-full bg-white border-none rounded-2xl p-4 font-semibold focus:ring-2 focus:ring-orange-500"
+                  className="w-full bg-white dark:bg-stone-900 border-none rounded-2xl p-4 font-semibold focus:ring-2 focus:ring-orange-500 text-stone-800 dark:text-stone-100 transition-colors"
                 />
               </div>
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-stone-400 uppercase tracking-wider mb-1">Ingredienti (uno per riga)</label>
+              <label className="block text-xs font-bold text-stone-400 dark:text-stone-500 uppercase tracking-wider mb-1">Ingredienti (uno per riga)</label>
               <textarea 
                 value={ingredients} 
                 onChange={e => setIngredients(e.target.value)}
                 rows={5}
                 placeholder="300g Pasta..."
-                className="w-full bg-white border-none rounded-2xl p-4 focus:ring-2 focus:ring-orange-500"
+                className="w-full bg-white dark:bg-stone-900 border-none rounded-2xl p-4 focus:ring-2 focus:ring-orange-500 text-stone-800 dark:text-stone-100 transition-colors placeholder:text-stone-300 dark:placeholder:text-stone-700"
               />
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-stone-400 uppercase tracking-wider mb-1">Procedimento</label>
+              <label className="block text-xs font-bold text-stone-400 dark:text-stone-500 uppercase tracking-wider mb-1">Procedimento</label>
               <textarea 
                 value={instructions}
                 onChange={e => setInstructions(e.target.value)}
                 rows={8}
                 placeholder="Inizia bollendo l'acqua..."
-                className="w-full bg-white border-none rounded-2xl p-4 focus:ring-2 focus:ring-orange-500"
+                className="w-full bg-white dark:bg-stone-900 border-none rounded-2xl p-4 focus:ring-2 focus:ring-orange-500 text-stone-800 dark:text-stone-100 transition-colors placeholder:text-stone-300 dark:placeholder:text-stone-700"
               />
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-stone-400 uppercase tracking-wider mb-1">Informazioni di Cottura</label>
+              <label className="block text-xs font-bold text-stone-400 dark:text-stone-500 uppercase tracking-wider mb-1">Informazioni di Cottura</label>
               <textarea 
                 value={cookingInfo}
                 onChange={e => setCookingInfo(e.target.value)}
                 rows={3}
                 placeholder="Es: Forno ventilato 180°C, ripiano centrale..."
-                className="w-full bg-white border-none rounded-2xl p-4 focus:ring-2 focus:ring-orange-500"
+                className="w-full bg-white dark:bg-stone-900 border-none rounded-2xl p-4 focus:ring-2 focus:ring-orange-500 text-stone-800 dark:text-stone-100 transition-colors placeholder:text-stone-300 dark:placeholder:text-stone-700"
               />
             </div>
           </div>
@@ -281,51 +283,51 @@ const RecipeDetail = ({
   };
 
   return (
-    <div className="fixed inset-0 bg-stone-50 z-40 overflow-y-auto pb-24">
+    <div className="fixed inset-0 bg-stone-50 dark:bg-stone-950 z-40 overflow-y-auto pb-24 transition-colors">
       <div className="relative h-72">
         {recipe.image ? (
           <img src={recipe.image} className="w-full h-full object-cover" />
         ) : (
-          <div className="w-full h-full bg-stone-200 flex items-center justify-center text-stone-400">
+          <div className="w-full h-full bg-stone-200 dark:bg-stone-800 flex items-center justify-center text-stone-400 dark:text-stone-600">
             <ChefHat size={64} />
           </div>
         )}
         <div className="absolute top-4 left-4 right-4 flex justify-between">
-          <button onClick={onBack} className="bg-white/80 backdrop-blur p-2 rounded-full text-stone-800">
+          <button onClick={onBack} className="bg-white/80 dark:bg-stone-900/80 backdrop-blur p-2 rounded-full text-stone-800 dark:text-stone-100">
             <ChevronLeft size={24} />
           </button>
           <div className="flex gap-2">
-            <button onClick={onEdit} className="bg-white/80 backdrop-blur p-2 rounded-full text-stone-800">
+            <button onClick={onEdit} className="bg-white/80 dark:bg-stone-900/80 backdrop-blur p-2 rounded-full text-stone-800 dark:text-stone-100">
               <Edit3 size={20} />
             </button>
-            <button onClick={onDelete} className="bg-white/80 backdrop-blur p-2 rounded-full text-red-500">
+            <button onClick={onDelete} className="bg-white/80 dark:bg-stone-900/80 backdrop-blur p-2 rounded-full text-red-500">
               <Trash2 size={20} />
             </button>
           </div>
         </div>
       </div>
 
-      <div className="px-6 -mt-8 relative bg-stone-50 rounded-t-[40px] pt-8">
-        <h1 className="text-3xl font-bold text-stone-900 leading-tight">{recipe.title}</h1>
+      <div className="px-6 -mt-8 relative bg-stone-50 dark:bg-stone-950 rounded-t-[40px] pt-8 transition-colors">
+        <h1 className="text-3xl font-bold text-stone-900 dark:text-stone-100 leading-tight">{recipe.title}</h1>
         
         <div className="flex gap-6 mt-6">
           <div className="flex flex-col">
-            <span className="text-xs font-bold text-stone-400 uppercase tracking-wider">Prep</span>
-            <span className="text-stone-800 font-semibold">{recipe.prepTime} min</span>
+            <span className="text-xs font-bold text-stone-400 dark:text-stone-500 uppercase tracking-wider">Prep</span>
+            <span className="text-stone-800 dark:text-stone-200 font-semibold">{recipe.prepTime} min</span>
           </div>
           <div className="flex flex-col">
-            <span className="text-xs font-bold text-stone-400 uppercase tracking-wider">Cottura</span>
-            <span className="text-stone-800 font-semibold">{recipe.cookTime} min</span>
+            <span className="text-xs font-bold text-stone-400 dark:text-stone-500 uppercase tracking-wider">Cottura</span>
+            <span className="text-stone-800 dark:text-stone-200 font-semibold">{recipe.cookTime} min</span>
           </div>
         </div>
 
         <div className="mt-8">
           <div className="flex justify-between items-center mb-4">
-            <h2 className="text-xl font-bold text-stone-800">Ingredienti</h2>
+            <h2 className="text-xl font-bold text-stone-800 dark:text-stone-100">Ingredienti</h2>
             {checkedIngredients.size > 0 && (
               <button 
                 onClick={resetIngredients}
-                className="flex items-center gap-1.5 text-xs font-bold text-orange-500 uppercase tracking-wider bg-orange-50 px-3 py-1.5 rounded-full active:scale-95 transition-transform"
+                className="flex items-center gap-1.5 text-xs font-bold text-orange-500 uppercase tracking-wider bg-orange-50 dark:bg-orange-500/10 px-3 py-1.5 rounded-full active:scale-95 transition-transform"
               >
                 <RotateCcw size={14} />
                 Reset Lista
@@ -339,14 +341,14 @@ const RecipeDetail = ({
                 onClick={() => toggleIngredient(i)}
                 className={`flex items-center gap-3 p-4 rounded-2xl transition-all cursor-pointer ${
                   checkedIngredients.has(i) 
-                    ? 'bg-orange-50 text-stone-400 line-through' 
-                    : 'bg-white text-stone-700 shadow-sm'
+                    ? 'bg-orange-50 dark:bg-orange-500/10 text-stone-400 dark:text-stone-600 line-through'
+                    : 'bg-white dark:bg-stone-900 text-stone-700 dark:text-stone-200 shadow-sm'
                 }`}
               >
                 <div className={`w-6 h-6 rounded-lg border-2 flex items-center justify-center transition-colors ${
                   checkedIngredients.has(i) 
                     ? 'bg-orange-500 border-orange-500' 
-                    : 'border-stone-200 bg-stone-50'
+                    : 'border-stone-200 dark:border-stone-800 bg-stone-50 dark:bg-stone-800'
                 }`}>
                   {checkedIngredients.has(i) && <Check size={16} className="text-white" />}
                 </div>
@@ -357,16 +359,16 @@ const RecipeDetail = ({
         </div>
 
         <div className="mt-8">
-          <h2 className="text-xl font-bold text-stone-800 mb-4">Procedimento</h2>
-          <p className="text-stone-600 leading-relaxed whitespace-pre-wrap">
+          <h2 className="text-xl font-bold text-stone-800 dark:text-stone-100 mb-4">Procedimento</h2>
+          <p className="text-stone-600 dark:text-stone-400 leading-relaxed whitespace-pre-wrap">
             {recipe.instructions}
           </p>
         </div>
 
         {recipe.cookingInfo && (
           <div className="mt-8">
-            <h2 className="text-xl font-bold text-stone-800 mb-4">Informazioni di Cottura</h2>
-            <div className="bg-orange-50 p-6 rounded-3xl text-stone-700 leading-relaxed border border-orange-100 italic">
+            <h2 className="text-xl font-bold text-stone-800 dark:text-stone-100 mb-4">Informazioni di Cottura</h2>
+            <div className="bg-orange-50 dark:bg-orange-500/10 p-6 rounded-3xl text-stone-700 dark:text-stone-300 leading-relaxed border border-orange-100 dark:border-orange-500/20 italic transition-colors">
               {recipe.cookingInfo}
             </div>
           </div>
@@ -384,9 +386,23 @@ export default function App() {
   const [selectedRecipe, setSelectedRecipe] = useState<Recipe | null>(null);
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingRecipe, setEditingRecipe] = useState<Recipe | null>(null);
+  const [isDarkMode, setIsDarkMode] = useState(() => {
+    return localStorage.getItem('theme') === 'dark' ||
+      (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches);
+  });
 
   // Update state
   const [updateAvailable, setUpdateAvailable] = useState<{ version: string; url: string } | null>(null);
+
+  useEffect(() => {
+    if (isDarkMode) {
+      document.documentElement.classList.add('dark');
+      localStorage.setItem('theme', 'dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+      localStorage.setItem('theme', 'light');
+    }
+  }, [isDarkMode]);
 
   useEffect(() => {
     const handleBackButton = CapacitorApp.addListener('backButton', ({ canGoBack }) => {
@@ -463,26 +479,34 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-stone-50 font-sans text-stone-900">
+    <div className="min-h-screen bg-stone-50 dark:bg-stone-950 font-sans text-stone-900 dark:text-stone-100 transition-colors">
       <header className="p-6 pb-2">
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h1 className="text-3xl font-black tracking-tight text-stone-900">MyGusto</h1>
-            <p className="text-stone-400 text-sm font-medium">Il tuo ricettario personale</p>
+            <h1 className="text-3xl font-black tracking-tight text-stone-900 dark:text-stone-100">MyGusto</h1>
+            <p className="text-stone-400 dark:text-stone-500 text-sm font-medium">Il tuo ricettario personale</p>
           </div>
-          <div className="w-12 h-12 rounded-2xl overflow-hidden shadow-sm border border-orange-100">
-            <img src={logo} alt="MyGusto Logo" className="w-full h-full object-cover" />
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => setIsDarkMode(!isDarkMode)}
+              className="p-3 bg-white dark:bg-stone-900 rounded-2xl shadow-sm border border-orange-50 dark:border-stone-800 text-orange-500 active:scale-95 transition-all"
+            >
+              {isDarkMode ? <Sun size={20} /> : <Moon size={20} />}
+            </button>
+            <div className="w-12 h-12 rounded-2xl overflow-hidden shadow-sm border border-orange-100 dark:border-stone-800">
+              <img src={logo} alt="MyGusto Logo" className="w-full h-full object-cover" />
+            </div>
           </div>
         </div>
 
         <div className="relative">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-stone-400" size={20} />
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-stone-400 dark:text-stone-600" size={20} />
           <input 
             type="text"
             placeholder="Cerca una ricetta..."
             value={search}
             onChange={e => setSearch(e.target.value)}
-            className="w-full bg-white border-none rounded-2xl py-4 pl-12 pr-4 shadow-sm focus:ring-2 focus:ring-orange-500"
+            className="w-full bg-white dark:bg-stone-900 border-none rounded-2xl py-4 pl-12 pr-4 shadow-sm focus:ring-2 focus:ring-orange-500 text-stone-800 dark:text-stone-100 placeholder:text-stone-300 dark:placeholder:text-stone-700 transition-colors"
           />
         </div>
       </header>
@@ -500,15 +524,15 @@ export default function App() {
 
         {filteredRecipes?.length === 0 && (
           <div className="text-center py-20">
-            <ChefHat className="mx-auto text-stone-200 mb-4" size={64} />
-            <p className="text-stone-400 font-medium">Nessuna ricetta trovata.</p>
+            <ChefHat className="mx-auto text-stone-200 dark:text-stone-800 mb-4" size={64} />
+            <p className="text-stone-400 dark:text-stone-600 font-medium">Nessuna ricetta trovata.</p>
           </div>
         )}
       </main>
 
       <button 
         onClick={() => setIsFormOpen(true)}
-        className="fixed bottom-8 right-8 bg-orange-500 text-white p-5 rounded-3xl shadow-xl shadow-orange-200 active:scale-95 transition-transform z-30"
+        className="fixed bottom-8 right-8 bg-orange-500 text-white p-5 rounded-3xl shadow-xl shadow-orange-200 dark:shadow-orange-900/20 active:scale-95 transition-transform z-30"
       >
         <Plus size={32} strokeWidth={3} />
       </button>
