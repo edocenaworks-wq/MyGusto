@@ -36,10 +36,13 @@ jobs:
         uses: android-actions/setup-android@v3
 
       - name: Add Android Platform
-        run: npx cap add android || true
+        run: npx @capacitor/cli add android || true
+
+      - name: Generate Assets
+        run: npm run assets
 
       - name: Sync Capacitor
-        run: npx cap sync android
+        run: npx @capacitor/cli sync android
 
       - name: Build APK (Release)
         run: |
