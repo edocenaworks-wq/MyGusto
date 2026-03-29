@@ -15,6 +15,7 @@ import {
   RotateCcw
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
+import logo from '../assets/logo.png';
 
 // --- Components ---
 
@@ -161,23 +162,23 @@ const RecipeForm = ({
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-stone-400 uppercase tracking-wider mb-1">Informazioni di Cottura</label>
+              <label className="block text-xs font-bold text-stone-400 uppercase tracking-wider mb-1">Procedimento</label>
               <textarea 
-                value={cookingInfo} 
-                onChange={e => setCookingInfo(e.target.value)}
-                rows={3}
-                placeholder="Es: Forno ventilato 180°C, ripiano centrale..."
+                value={instructions}
+                onChange={e => setInstructions(e.target.value)}
+                rows={8}
+                placeholder="Inizia bollendo l'acqua..."
                 className="w-full bg-white border-none rounded-2xl p-4 focus:ring-2 focus:ring-orange-500"
               />
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-stone-400 uppercase tracking-wider mb-1">Procedimento</label>
+              <label className="block text-xs font-bold text-stone-400 uppercase tracking-wider mb-1">Informazioni di Cottura</label>
               <textarea 
-                value={instructions} 
-                onChange={e => setInstructions(e.target.value)}
-                rows={8}
-                placeholder="Inizia bollendo l'acqua..."
+                value={cookingInfo}
+                onChange={e => setCookingInfo(e.target.value)}
+                rows={3}
+                placeholder="Es: Forno ventilato 180°C, ripiano centrale..."
                 className="w-full bg-white border-none rounded-2xl p-4 focus:ring-2 focus:ring-orange-500"
               />
             </div>
@@ -359,7 +360,7 @@ export default function App() {
             <p className="text-stone-400 text-sm font-medium">Il tuo ricettario personale</p>
           </div>
           <div className="w-12 h-12 rounded-2xl overflow-hidden shadow-sm border border-orange-100">
-            <img src="/logo.png" alt="MyGusto Logo" className="w-full h-full object-cover" />
+            <img src={logo} alt="MyGusto Logo" className="w-full h-full object-cover" />
           </div>
         </div>
 
