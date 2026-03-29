@@ -432,7 +432,7 @@ export default function App() {
           const latest = data.tag_name.replace('v', '');
           const current = CURRENT_VERSION;
 
-          if (latest !== current && latest !== '0.0.0') {
+          if (latest !== current) {
             setUpdateAvailable({
               version: latest,
               url: data.html_url
