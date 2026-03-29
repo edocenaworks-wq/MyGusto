@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { db, type Recipe } from './db';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { 
@@ -200,9 +200,13 @@ const RecipeDetail = ({
   onEdit: () => void; 
   onDelete: () => void;
 }) => {
-  const [checkedIngredients, setCheckedIngredients] = useState<Set<number>>(new Set());
+  const [checkedIngredients, setCheckedIngredients] = useState<Set<number>>(new Set(recipe.checkedIngredients || []));
 
-  const toggleIngredient = (index: number) => {
+  useEffect(() => {
+    setCheckedIngredients(new Set(recipe.checkedIngredients || []));
+  }, [recipe.checkedIngredients]);
+
+  const toggleIngredient = async (index: number) => {
     const newChecked = new Set(checkedIngredients);
     if (newChecked.has(index)) {
       newChecked.delete(index);
@@ -210,10 +214,21 @@ const RecipeDetail = ({
       newChecked.add(index);
     }
     setCheckedIngredients(newChecked);
+
+    if (recipe.id) {
+      await db.recipes.update(recipe.id, {
+        checkedIngredients: Array.from(newChecked)
+      });
+    }
   };
 
-  const resetIngredients = () => {
+  const resetIngredients = async () => {
     setCheckedIngredients(new Set());
+    if (recipe.id) {
+      await db.recipes.update(recipe.id, {
+        checkedIngredients: []
+      });
+    }
   };
 
   return (
@@ -333,7 +348,8 @@ export default function App() {
       await db.recipes.add({
         ...data as Recipe,
         createdAt: now,
-        updatedAt: now
+        updatedAt: now,
+        checkedIngredients: []
       });
     }
     setIsFormOpen(false);

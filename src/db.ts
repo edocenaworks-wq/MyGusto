@@ -11,6 +11,7 @@ export interface Recipe {
   image?: string; // base64 or local path
   createdAt: number;
   updatedAt: number;
+  checkedIngredients?: number[]; // indices of checked ingredients
 }
 
 export class MyGustoDB extends Dexie {
@@ -18,8 +19,12 @@ export class MyGustoDB extends Dexie {
 
   constructor() {
     super('MyGustoDB');
-    this.version(1).stores({
-      recipes: '++id, title, createdAt' // index by id, title and date
+    this.version(2).stores({
+      recipes: '++id, title, createdAt'
+    }).upgrade(tx => {
+      return tx.table('recipes').toCollection().modify(recipe => {
+        recipe.checkedIngredients = [];
+      });
     });
   }
 }
