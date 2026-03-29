@@ -12,12 +12,61 @@ import {
   Camera,
   X,
   Check,
-  RotateCcw
+  RotateCcw,
+  Download
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
+import { App as CapacitorApp } from '@capacitor/app';
 import logo from '../assets/logo.png';
+import packageJson from '../package.json';
+
+// --- Configuration ---
+const GITHUB_OWNER = 'edocenaworks-wq';
+const GITHUB_REPO = 'MyGusto';
+const CURRENT_VERSION = packageJson.version;
 
 // --- Components ---
+
+const UpdatePopup = ({ latestVersion, releaseUrl, onIgnore }: {
+  latestVersion: string;
+  releaseUrl: string;
+  onIgnore: () => void;
+}) => (
+  <motion.div
+    initial={{ opacity: 0, y: 100 }}
+    animate={{ opacity: 1, y: 0 }}
+    exit={{ opacity: 0, y: 100 }}
+    className="fixed bottom-24 left-6 right-6 bg-stone-900 text-white p-6 rounded-[32px] shadow-2xl z-[60] border border-white/10"
+  >
+    <div className="flex items-start gap-4">
+      <div className="bg-orange-500 p-3 rounded-2xl">
+        <Download size={24} className="text-white" />
+      </div>
+      <div className="flex-1">
+        <h3 className="font-bold text-lg">Aggiornamento Disponibile!</h3>
+        <p className="text-stone-400 text-sm mt-1">
+          È disponibile la versione <b>{latestVersion}</b>. Tu hai la {CURRENT_VERSION}.
+        </p>
+        <div className="flex gap-3 mt-4">
+          <a
+            href={releaseUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="bg-white text-stone-900 px-5 py-2.5 rounded-full font-bold text-sm flex-1 text-center"
+          >
+            Scarica Ora
+          </a>
+          <button
+            onClick={onIgnore}
+            className="bg-stone-800 text-stone-400 px-5 py-2.5 rounded-full font-bold text-sm"
+          >
+            Più tardi
+          </button>
+        </div>
+      </div>
+    </div>
+  </motion.div>
+);
 
 const RecipeCard = ({ recipe, onClick }: { recipe: Recipe; onClick: () => void }) => (
   <motion.div
@@ -336,6 +385,52 @@ export default function App() {
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingRecipe, setEditingRecipe] = useState<Recipe | null>(null);
 
+  // Update state
+  const [updateAvailable, setUpdateAvailable] = useState<{ version: string; url: string } | null>(null);
+
+  useEffect(() => {
+    const handleBackButton = CapacitorApp.addListener('backButton', ({ canGoBack }) => {
+      if (isFormOpen) {
+        setIsFormOpen(false);
+        setEditingRecipe(null);
+      } else if (selectedRecipe) {
+        setSelectedRecipe(null);
+      } else {
+        CapacitorApp.exitApp();
+      }
+    });
+
+    return () => {
+      handleBackButton.then(h => h.remove());
+    };
+  }, [isFormOpen, selectedRecipe]);
+
+  // Check for updates
+  useEffect(() => {
+    const checkUpdates = async () => {
+      try {
+        const response = await fetch(`https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/releases/latest`);
+        const data = await response.json();
+
+        if (data.tag_name) {
+          const latest = data.tag_name.replace('v', '');
+          const current = CURRENT_VERSION;
+
+          if (latest !== current && latest !== '0.0.0') {
+            setUpdateAvailable({
+              version: latest,
+              url: data.html_url
+            });
+          }
+        }
+      } catch (error) {
+        console.error('Error checking for updates:', error);
+      }
+    };
+
+    checkUpdates();
+  }, []);
+
   const filteredRecipes = recipes?.filter(r => 
     r.title.toLowerCase().includes(search.toLowerCase())
   );
@@ -419,6 +514,14 @@ export default function App() {
       </button>
 
       <AnimatePresence>
+        {updateAvailable && (
+          <UpdatePopup
+            latestVersion={updateAvailable.version}
+            releaseUrl={updateAvailable.url}
+            onIgnore={() => setUpdateAvailable(null)}
+          />
+        )}
+
         {selectedRecipe && (
           <RecipeDetail 
             recipe={selectedRecipe}
